@@ -34,10 +34,7 @@ public class UserService {
             throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
         }
         // 이름과 비밀번호 양식
-        String nameVal= "^[a-z0-9]{4,10}$";
-        String passVal="^[a-zA-Z0-9]{8,15}$";
-        if(!Pattern.matches(nameVal, username)) throw new IllegalArgumentException("이름이 올바르지 않습니다.");
-        if(!Pattern.matches(passVal, requestDto.getPassword())) throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        validationCheck(username, requestDto.getPassword());
         // 사용자 등록
         User user = new User(username, password);
         userRepository.save(user);
@@ -54,7 +51,17 @@ public class UserService {
             throw new IllegalArgumentException("패스워드가 일치하지 않습니다.");
 
         }
-        String token = jwtUtil.createToken(user.getUsername());
+        issueNewToken(username, res);
+    }
+
+    public void issueNewToken(String username, HttpServletResponse res){
+        String token = jwtUtil.createToken(username);
         jwtUtil.addJwtToCookie(token, res);
+    }
+    public void validationCheck(String username, String password){
+        String nameVal= "^[a-z0-9]{4,10}$";
+        String passVal="^[a-zA-Z0-9]{8,15}$";
+        if(!Pattern.matches(nameVal, username)) throw new IllegalArgumentException("이름이 올바르지 않습니다. 소문자와 숫자로 4~10자를 입력해주세요.");
+        if(!Pattern.matches(passVal, password)) throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.영문 대,소문자와 숫자로 8~15자를 입력해주세요.");
     }
 }
