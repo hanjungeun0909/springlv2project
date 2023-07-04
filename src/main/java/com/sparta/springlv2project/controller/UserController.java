@@ -8,11 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
     private static final String HostUrl = "http://localhost:8080";
@@ -21,7 +23,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/user/signup")
+    @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody SignupRequestDto signupRequestDto){
         System.out.println("signupRequestDto.getPassword() = " + signupRequestDto.getPassword());
         System.out.println("signupRequestDto.getUsername() = " + signupRequestDto.getUsername());
@@ -30,7 +32,7 @@ public class UserController {
         URI location = URI.create(HostUrl+redirectUrl);
         return ResponseEntity.status(HttpStatus.FOUND).location(location).body("회원 가입이 완료되었습니다 !");
     }
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res){
         userService.login(loginRequestDto, res);
         String redirectUrl = "/board";
