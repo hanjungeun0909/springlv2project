@@ -33,5 +33,5 @@ public class BoardController {
         return boardService.getUserPost(res);
     }
 
-    //수정 & 삭제기능 구현 필요
+    //수정 & 삭제기능 구현 필요22
 }
