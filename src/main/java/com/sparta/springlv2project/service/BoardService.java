@@ -24,14 +24,21 @@ public class BoardService {
     }
     public void posting(PostRequestDto postRequestDto, HttpServletRequest res) {
         String Token = jwtUtil.getTokenFromRequest(res);
-        Claims username=jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token));
-            Post post = new Post(postRequestDto, username);
+        Claims userToken=jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token));
+            Post post = new Post(postRequestDto, userToken);
             boardRepository.save(post);
     }
 
 
     public List<PostResponseDto> getAllPost() {
         return boardRepository.findAll().stream().map(PostResponseDto::new).toList();
-
     }
+
+    public List<PostResponseDto> getUserPost(HttpServletRequest res) {
+        String Token = jwtUtil.getTokenFromRequest(res);
+        String userToken=jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token)).getSubject();
+        return boardRepository.findAllByUsername(userToken).stream().map(PostResponseDto::new).toList();
+    }
+
+    //수정 & 삭제기능 구현 필요
 }

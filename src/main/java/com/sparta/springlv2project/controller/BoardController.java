@@ -4,7 +4,6 @@ import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import com.sparta.springlv2project.dto.boardDto.PostResponseDto;
 import com.sparta.springlv2project.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,4 +30,10 @@ public class BoardController {
 
         return boardService.getAllPost();
     }
+    @GetMapping("/board/user")
+    public List<PostResponseDto> getUserPost(HttpServletRequest res){
+        return boardService.getUserPost(res);
+    }
+
+    //수정 & 삭제기능 구현 필요
 }

@@ -18,6 +18,8 @@ public class ExceptionController {
         System.out.println(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
+
+    //Entity에 Null값 주입 시도하면 발생하는 예외
     @ExceptionHandler(PropertyValueException.class)
     public ResponseEntity<String> HandlePropertyValueException(PropertyValueException e){
         System.out.println(e.getMessage());
