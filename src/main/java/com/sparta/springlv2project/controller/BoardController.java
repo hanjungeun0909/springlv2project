@@ -6,31 +6,29 @@ import com.sparta.springlv2project.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/board")
 public class BoardController {
     private final BoardService boardService;
     public BoardController(BoardService boardService) {
         this.boardService = boardService;
     }
 
-    @PostMapping("/board/posting")
+    @PostMapping("/posting")
     public ResponseEntity<String> posting(@RequestBody PostRequestDto postRequestDto, HttpServletRequest res){
         boardService.posting(postRequestDto, res);
         return ResponseEntity.status(HttpStatus.OK).body("포스팅 완료 !");
     }
-    @GetMapping("/board/all")
+    @GetMapping("/all")
     public List<PostResponseDto> getAllPost() {
 
         return boardService.getAllPost();
     }
-    @GetMapping("/board/user")
+    @GetMapping("/user")
     public List<PostResponseDto> getUserPost(HttpServletRequest res){
         return boardService.getUserPost(res);
     }
