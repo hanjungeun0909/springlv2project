@@ -51,33 +51,57 @@ public class BoardService {
     public PostResponseDto patchPostById(Long postId, PostRequestDto requestDto, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
-        if(post.verifyAuthority(userInfo, post.getUsername())){
+        if (post.verifyAuthority(userInfo, post.getUsername())) {
             post.update(requestDto);
         }
         return new PostResponseDto(post);
     }
 
+    @Transactional
     public Long deletePostById(Long postId, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
-        if(post.verifyAuthority(userInfo, post.getUsername())){
+        if (post.verifyAuthority(userInfo, post.getUsername())) {
             postRepository.deleteById(postId);
         }
         return postId;
     }
+
     public CommentResponseDto commenting(Long postId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
-        Comment comment=new Comment(commentRequestDto, userInfo, post);
+        Comment comment = new Comment(commentRequestDto, userInfo, post);
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
     }
+
+    @Transactional
+    public CommentResponseDto patchCommentById(Long postId, Long commentId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
+        Claims userInfo = getUserInfoFromRequest(req);
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId 입니다."));
+        if (!postId.equals(comment.getPost().getPostId())) throw new IllegalArgumentException("해당 포스트의 댓글이 아닙니다.");
+        if (comment.verifyAuthority(userInfo, comment.getUsername())) {
+            comment.update(commentRequestDto);
+        }
+        return new CommentResponseDto(comment);
+    }
+
+    @Transactional
+    public Long deleteCommentById(Long postId, Long commentId, HttpServletRequest req) {
+        Claims userInfo = getUserInfoFromRequest(req);
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId 입니다."));
+        if (!postId.equals(comment.getPost().getPostId())) throw new IllegalArgumentException("해당 포스트의 댓글이 아닙니다.");
+        if (comment.verifyAuthority(userInfo, comment.getUsername())) {
+            commentRepository.deleteById(postId);
+        }
+        return postId;
+    }
+
     private Claims getUserInfoFromRequest(HttpServletRequest req) {
         String Token = jwtUtil.getTokenFromRequest(req);
         return jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token));
     }
 
-  //  public CommentResponseDto patchCommentById(Long postId, Long commentId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
-
-   // }
 }

@@ -27,28 +27,6 @@ public class BoardController {
         PostResponseDto res= boardService.posting(postRequestDto, req);
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
-    @PostMapping("/{postId}/commenting")
-    public ResponseEntity<CommentResponseDto> commenting(@PathVariable Long postId,
-                                                         @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest req){
-        CommentResponseDto res= boardService.commenting(postId, commentRequestDto, req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(res);
-    }
-//    @PatchMapping("/{postId}/{commentId}")
-//    public ResponseEntity<CommentResponseDto> patchPostById(@PathVariable Long postId, @PathVariable Long commentId,
-//                                                             @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest req) {
-//        CommentResponseDto res = boardService.patchCommentById(postId, commentId, commentRequestDto, req);
-//        return ResponseEntity.status(HttpStatus.OK).body(res);
-//    }
-    @GetMapping("/all")
-    public List<PostResponseDto> getAllPost() {
-        return boardService.getAllPost();
-    }
-
-    @GetMapping("/user")
-    public List<PostResponseDto> getUserPost(HttpServletRequest req) {
-        return boardService.getUserPost(req);
-    }
-
     @PatchMapping("/{postId}")
     public PostResponseDto patchPostById(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto, HttpServletRequest req) {
         return boardService.patchPostById(postId, postRequestDto, req);
@@ -57,5 +35,32 @@ public class BoardController {
     @DeleteMapping("/{postId}")
     public Long deletePostById(@PathVariable Long postId, HttpServletRequest req) {
         return boardService.deletePostById(postId, req);
+    }
+    @PostMapping("/{postId}/commenting")
+    public ResponseEntity<CommentResponseDto> commenting(@PathVariable Long postId,
+                                                         @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest req){
+        CommentResponseDto res= boardService.commenting(postId, commentRequestDto, req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
+    }
+    @PatchMapping("/{postId}/{commentId}")
+    public ResponseEntity<CommentResponseDto> patchPostById(@PathVariable Long postId, @PathVariable Long commentId,
+                                                             @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest req) {
+        CommentResponseDto res = boardService.patchCommentById(postId, commentId, commentRequestDto, req);
+        return ResponseEntity.status(HttpStatus.OK).body(res);
+    }
+
+    @DeleteMapping("/{postId}/{commentId}")
+    public Long deletePostById(@PathVariable Long postId, @PathVariable Long commentId,
+                               HttpServletRequest req) {
+        return boardService.deleteCommentById(postId, commentId, req);
+    }
+    @GetMapping("/all")
+    public List<PostResponseDto> getAllPost() {
+        return boardService.getAllPost();
+    }
+
+    @GetMapping("/user")
+    public List<PostResponseDto> getUserPost(HttpServletRequest req) {
+        return boardService.getUserPost(req);
     }
 }
