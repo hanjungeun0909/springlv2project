@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,7 +40,12 @@ public class BoardService {
 
 
     public List<PostResponseDto> getAllPost() {
-        return postRepository.findAll().stream().map(PostResponseDto::new).toList();
+        List<Post> postList = postRepository.findByOrderByCreatedAtDesc();
+        List<PostResponseDto> AllPostList = new ArrayList<>();
+        for (Post post: postList) {
+            AllPostList.add(new PostResponseDto(post));
+        }
+        return AllPostList;
     }
 
     public List<PostResponseDto> getUserPost(HttpServletRequest req) {
