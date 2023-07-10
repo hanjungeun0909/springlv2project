@@ -43,16 +43,17 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
     @PatchMapping("/{postId}/{commentId}")
-    public ResponseEntity<CommentResponseDto> patchPostById(@PathVariable Long postId, @PathVariable Long commentId,
+    public ResponseEntity<CommentResponseDto> patchCommentById(@PathVariable Long postId, @PathVariable Long commentId,
                                                              @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest req) {
         CommentResponseDto res = boardService.patchCommentById(postId, commentId, commentRequestDto, req);
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     @DeleteMapping("/{postId}/{commentId}")
-    public Long deletePostById(@PathVariable Long postId, @PathVariable Long commentId,
+    public ResponseEntity<String> deleteCommentById(@PathVariable Long postId, @PathVariable Long commentId,
                                HttpServletRequest req) {
-        return boardService.deleteCommentById(postId, commentId, req);
+        boardService.deleteCommentById(postId, commentId, req);
+        return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료되었습니다.");
     }
     @GetMapping("/all")
     public List<PostResponseDto> getAllPost() {
