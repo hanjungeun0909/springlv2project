@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -23,10 +26,22 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList= new ArrayList<>();
+
     public Post(PostRequestDto postRequestDto, Claims userInfo) {
         this.username = userInfo.getSubject();
         this.subject = postRequestDto.getSubject();
         this.contents = postRequestDto.getContents();
     }
-
+    public Boolean verifyAuthority(Claims userInfo, String username) {
+        if (!(userInfo.get("AUTHORIZATION_KEY").equals(UserRoleEnum.ADMIN) || userInfo.getSubject().equals(username))) {
+            throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
+        }
+        return true;
+    }
+    public void update(PostRequestDto postRequestDto){
+        this.subject = postRequestDto.getSubject();
+        this.contents = postRequestDto.getContents();
+    }
 }
