@@ -33,10 +33,10 @@ public class AuthFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         String url = httpServletRequest.getRequestURI();
-        if (url.equals("/")||(StringUtils.hasText(url) && (url.startsWith("/user")))) {
+        if (url.equals("/") || (StringUtils.hasText(url) && url.startsWith("/user"))) {
             log.info("인증 처리를 하지 않는 url = " + url);
-            // 회원가입, 로그인 관련 API 는 인증 필요없이 요청 진행
-            chain.doFilter(request, response); // 다음 Filter 로 이동
+            // 회원가입, 로그인 관련 API는 인증이 필요 없이 요청 진행
+            chain.doFilter(request, response); // 다음 Filter로 이동
         } else {
             // 나머지 API 요청은 인증 처리 진행
             // 토큰 확인
@@ -47,9 +47,9 @@ public class AuthFilter implements Filter {
 
                 // 토큰 검증
                 if (!jwtUtil.validateToken(token)) {
-                    ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    throw new IllegalArgumentException("Token Error");
-
+                    httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    statusMsg(httpServletResponse, "토큰 오류");
+                    return;
                 }
 
                 // 토큰에서 사용자 정보 가져오기
@@ -57,11 +57,19 @@ public class AuthFilter implements Filter {
                 User user = userRepository.findByUsername(info.getSubject()).orElseThrow(() ->
                         new NullPointerException("Not Found User"));
                 request.setAttribute("user", user);
-                chain.doFilter(request, response); // 다음 Filter 로 이동
+                chain.doFilter(request, response); // 다음 Filter로 이동
             } else {
-                ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                statusMsg(httpServletResponse, "토큰 없어");
             }
         }
+    }
+    private void statusMsg(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String json = "{\"statusCode\":\"" + HttpServletResponse.SC_BAD_REQUEST + "\", \"message\":\"" + message + "\"}";
+        response.getWriter().write(json);
     }
 
 }
