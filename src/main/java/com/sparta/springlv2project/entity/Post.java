@@ -12,6 +12,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sparta.springlv2project.jwt.JwtUtil.AUTHORIZATION_KEY;
+
 @Getter
 @Setter
 @Entity
@@ -39,9 +41,12 @@ public class Post extends Timestamped {
         this.contents = postRequestDto.getContents();
     }
     public Boolean verifyAuthority(Claims userInfo, String username) {
-        UserRoleEnum role = (UserRoleEnum) userInfo.get("AUTHORIZATION_KEY");
         String TokenName = userInfo.getSubject();
-        if (!(role!=null && role.equals(UserRoleEnum.ADMIN) || TokenName.equals(username))) {
+        System.out.println("TokenName = " + TokenName);
+        String role = userInfo.get(AUTHORIZATION_KEY, String.class);
+        System.out.println("role = " + role);
+ 
+        if (!(role!=null && role.equals(UserRoleEnum.ADMIN.getAuthority())) || TokenName.equals(username)) {
             throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
         return true;

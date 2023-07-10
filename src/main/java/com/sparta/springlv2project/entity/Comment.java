@@ -34,9 +34,9 @@ public class Comment extends Timestamped{
     }
 
     public Boolean verifyAuthority(Claims userInfo, String username) {
-        UserRoleEnum role= (UserRoleEnum)userInfo.get("AUTHORIZATION_KEY");
+        String role= userInfo.get("auth", String.class);
         String tokenName = userInfo.getSubject();
-        if (!((role!=null && role.equals(UserRoleEnum.ADMIN)) || tokenName.equals(username))) {
+        if (!((role!=null && role.equals("ADMIN") || tokenName.equals(username)))) {
             throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
         return true;
