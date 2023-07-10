@@ -1,60 +1,102 @@
 package com.sparta.springlv2project.service;
 
+import com.sparta.springlv2project.dto.boardDto.CommentRequestDto;
+import com.sparta.springlv2project.dto.boardDto.CommentResponseDto;
 import com.sparta.springlv2project.dto.boardDto.PostResponseDto;
 import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import com.sparta.springlv2project.entity.Post;
+import com.sparta.springlv2project.entity.Comment;
 import com.sparta.springlv2project.jwt.JwtUtil;
-import com.sparta.springlv2project.repository.BoardRepository;
+import com.sparta.springlv2project.repository.PostRepository;
+import com.sparta.springlv2project.repository.CommentRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class BoardService {
 
 
-    private final BoardRepository boardRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final JwtUtil jwtUtil;
 
-    public BoardService(BoardRepository boardRepository, JwtUtil jwtUtil) {
-        this.boardRepository = boardRepository;
+    public BoardService(PostRepository postRepository, CommentRepository commentRepository, JwtUtil jwtUtil) {
+        this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
         this.jwtUtil = jwtUtil;
     }
 
-    public void posting(PostRequestDto postRequestDto, HttpServletRequest req) {
+    public PostResponseDto posting(PostRequestDto postRequestDto, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
         Post post = new Post(postRequestDto, userInfo);
-        boardRepository.save(post);
+        postRepository.save(post);
+        return new PostResponseDto(post);
     }
 
 
     public List<PostResponseDto> getAllPost() {
-        return boardRepository.findAll().stream().map(PostResponseDto::new).toList();
+        return postRepository.findAll().stream().map(PostResponseDto::new).toList();
     }
 
     public List<PostResponseDto> getUserPost(HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
-        return boardRepository.findAllByUsername(userInfo.getSubject()).stream().map(PostResponseDto::new).toList();
+        return postRepository.findAllByUsername(userInfo.getSubject()).stream().map(PostResponseDto::new).toList();
     }
 
     @Transactional
-    public PostResponseDto patchBoardById(Long boardId, PostRequestDto requestDto, HttpServletRequest req) {
+    public PostResponseDto patchPostById(Long postId, PostRequestDto requestDto, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
-        Post post = comparePostUserAndUser(boardId, userInfo.getSubject());
-        post.setSubject(requestDto.getSubject());
-        post.setContents(requestDto.getContents());
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        if (post.verifyAuthority(userInfo, post.getUsername())) {
+            post.update(requestDto);
+        }
         return new PostResponseDto(post);
     }
 
-    public Long deleteBoardById(Long boardId, HttpServletRequest req) {
+    @Transactional
+    public Long deletePostById(Long postId, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
-        Post post = comparePostUserAndUser(boardId, userInfo.getSubject());
-        boardRepository.deleteById(boardId);
-        return boardId;
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        if (post.verifyAuthority(userInfo, post.getUsername())) {
+            postRepository.deleteById(postId);
+        }
+        return postId;
+    }
+
+    public CommentResponseDto commenting(Long postId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
+        Claims userInfo = getUserInfoFromRequest(req);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        Comment comment = new Comment(commentRequestDto, userInfo, post);
+        commentRepository.save(comment);
+        return new CommentResponseDto(comment);
+    }
+
+    @Transactional
+    public CommentResponseDto patchCommentById(Long postId, Long commentId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
+        Claims userInfo = getUserInfoFromRequest(req);
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId 입니다."));
+        if (!postId.equals(comment.getPost().getPostId())) throw new IllegalArgumentException("해당 포스트의 댓글이 아닙니다.");
+        if (comment.verifyAuthority(userInfo, comment.getUsername())) {
+            comment.update(commentRequestDto);
+        }
+        return new CommentResponseDto(comment);
+    }
+
+    @Transactional
+    public Long deleteCommentById(Long postId, Long commentId, HttpServletRequest req) {
+        Claims userInfo = getUserInfoFromRequest(req);
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId 입니다."));
+        if (!postId.equals(comment.getPost().getPostId())) throw new IllegalArgumentException("해당 포스트의 댓글이 아닙니다.");
+        if (comment.verifyAuthority(userInfo, comment.getUsername())) {
+            commentRepository.deleteById(postId);
+        }
+        return postId;
     }
 
     private Claims getUserInfoFromRequest(HttpServletRequest req) {
@@ -62,9 +104,4 @@ public class BoardService {
         return jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token));
     }
 
-    private Post comparePostUserAndUser(Long boardId, String username) {
-        Post post = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 boardId 입니다."));
-        if (Objects.equals(post.getUsername(), username)) return post;
-        throw new IllegalArgumentException("권한이 없는 유저입니다.");
-    }
 }
