@@ -1,6 +1,7 @@
 package com.sparta.springlv2project.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.*;
@@ -27,8 +28,9 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @OrderBy("createdAt DESC")
     private List<Comment> commentList= new ArrayList<>();
 
     public Post(PostRequestDto postRequestDto, Claims userInfo) {

@@ -1,5 +1,7 @@
 package com.sparta.springlv2project.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.springlv2project.dto.boardDto.CommentRequestDto;
 import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import io.jsonwebtoken.Claims;
@@ -21,6 +23,7 @@ public class Comment extends Timestamped{
     @Column(name="comment", nullable = false)
     private String comment;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name="post_id")
     private Post post;

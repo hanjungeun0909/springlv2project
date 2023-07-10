@@ -5,6 +5,7 @@ import com.sparta.springlv2project.dto.boardDto.CommentResponseDto;
 import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import com.sparta.springlv2project.dto.boardDto.PostResponseDto;
 import com.sparta.springlv2project.entity.Comment;
+import com.sparta.springlv2project.entity.Post;
 import com.sparta.springlv2project.service.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -64,4 +65,11 @@ public class BoardController {
     public List<PostResponseDto> getUserPost(HttpServletRequest req) {
         return boardService.getUserPost(req);
     }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getOnePostById(@PathVariable Long postId){
+        PostResponseDto postResponseDto = boardService.getOnePostById(postId);
+        return ResponseEntity.status(HttpStatus.OK).body(postResponseDto);
+    }
+
 }
