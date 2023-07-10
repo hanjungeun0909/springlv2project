@@ -6,8 +6,8 @@ import com.sparta.springlv2project.repository.CommentRepository;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class PostResponseDto {
@@ -17,8 +17,8 @@ public class PostResponseDto {
     private final String contents;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
-
     private List<CommentResponseDto> commentListA = new ArrayList<>();
+  
     public PostResponseDto(Post post) {
         this.postId = post.getPostId();
         this.subject = post.getSubject();

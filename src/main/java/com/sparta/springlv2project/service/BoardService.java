@@ -40,6 +40,7 @@ public class BoardService {
 
 
     public List<PostResponseDto> getAllPost() {
+
         List<Post> postList = postRepository.findByOrderByCreatedAtDesc();
         List<PostResponseDto> AllPostList = new ArrayList<>();
         for (Post post: postList) {
@@ -50,7 +51,7 @@ public class BoardService {
 
     public List<PostResponseDto> getUserPost(HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
-        return postRepository.findAllByUsername(userInfo.getSubject()).stream().map(PostResponseDto::new).toList();
+        return postRepository.findAllByUsernameOrderByCreatedAtDesc(userInfo.getSubject()).stream().map(PostResponseDto::new).toList();
     }
 
     @Transactional
@@ -109,4 +110,8 @@ public class BoardService {
         return jwtUtil.getUserInfoFromToken(jwtUtil.substringToken(Token));
     }
 
+    public PostResponseDto getOnePostById(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
+        return new PostResponseDto(post);
+    }
 }

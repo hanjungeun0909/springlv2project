@@ -29,8 +29,8 @@ public class Post extends Timestamped {
     private String contents;
 
     @JsonManagedReference
-    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @OrderBy("createdAt DESC")
     private List<Comment> commentList= new ArrayList<>();
 
     public Post(PostRequestDto postRequestDto, Claims userInfo) {
