@@ -28,13 +28,13 @@ public class UserController {
         userService.signup(signupRequestDto);
   //      String redirectUrl = "/user/login-page";
   //      URI location = URI.create(HostUrl+redirectUrl);
-        return ResponseEntity.status(HttpStatus.FOUND).body("회원 가입이 완료되었습니다 !");
+        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입이 완료되었습니다 !");
     }
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res){
         userService.login(loginRequestDto, res);
   //      String redirectUrl = "/board";
    //     URI location = URI.create(HostUrl+redirectUrl);
-         return ResponseEntity.status(HttpStatus.FOUND).body("로그인 성공 !");
+         return ResponseEntity.status(HttpStatus.OK).body("로그인 성공 !");
     }
 }

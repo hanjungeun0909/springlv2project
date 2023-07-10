@@ -2,12 +2,11 @@ package com.sparta.springlv2project.dto.boardDto;
 
 import com.sparta.springlv2project.entity.Comment;
 import com.sparta.springlv2project.entity.Post;
-import com.sparta.springlv2project.repository.CommentRepository;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class PostResponseDto {
