@@ -39,7 +39,9 @@ public class Post extends Timestamped {
         this.contents = postRequestDto.getContents();
     }
     public Boolean verifyAuthority(Claims userInfo, String username) {
-        if (!(userInfo.get("AUTHORIZATION_KEY").equals(UserRoleEnum.ADMIN) || userInfo.getSubject().equals(username))) {
+        UserRoleEnum role = (UserRoleEnum) userInfo.get("AUTHORIZATION_KEY");
+        String TokenName = userInfo.getSubject();
+        if (!(role!=null && role.equals(UserRoleEnum.ADMIN) || TokenName.equals(username))) {
             throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
         return true;

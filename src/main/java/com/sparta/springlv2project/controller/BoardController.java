@@ -34,8 +34,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/{postId}")
-    public Long deletePostById(@PathVariable Long postId, HttpServletRequest req) {
-        return boardService.deletePostById(postId, req);
+    public ResponseEntity<String> deletePostById(@PathVariable Long postId, HttpServletRequest req) {
+       boardService.deletePostById(postId, req);
+       return ResponseEntity.status(HttpStatus.OK).body("게시글 삭제가 완료되었습니다.");
     }
     @PostMapping("/{postId}/commenting")
     public ResponseEntity<CommentResponseDto> commenting(@PathVariable Long postId,
@@ -54,7 +55,7 @@ public class BoardController {
     public ResponseEntity<String> deleteCommentById(@PathVariable Long postId, @PathVariable Long commentId,
                                HttpServletRequest req) {
         boardService.deleteCommentById(postId, commentId, req);
-        return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK).body("댓글 삭제가 완료되었습니다.");
     }
     @GetMapping("/all")
     public List<PostResponseDto> getAllPost() {

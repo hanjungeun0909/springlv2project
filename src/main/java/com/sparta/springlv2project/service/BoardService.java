@@ -65,13 +65,12 @@ public class BoardService {
     }
 
     @Transactional
-    public Long deletePostById(Long postId, HttpServletRequest req) {
+    public void deletePostById(Long postId, HttpServletRequest req) {
         Claims userInfo = getUserInfoFromRequest(req);
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 postId 입니다."));
         if (post.verifyAuthority(userInfo, post.getUsername())) {
             postRepository.deleteById(postId);
         }
-        return postId;
     }
 
     public CommentResponseDto commenting(Long postId, CommentRequestDto commentRequestDto, HttpServletRequest req) {
