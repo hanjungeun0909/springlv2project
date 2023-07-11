@@ -1,6 +1,5 @@
 package com.sparta.springlv2project.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sparta.springlv2project.dto.boardDto.PostRequestDto;
 import io.jsonwebtoken.Claims;
@@ -30,7 +29,6 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     private String contents;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     @OrderBy("createdAt DESC")
     private List<Comment> commentList= new ArrayList<>();
@@ -41,12 +39,9 @@ public class Post extends Timestamped {
         this.contents = postRequestDto.getContents();
     }
     public Boolean verifyAuthority(Claims userInfo, String username) {
-        String TokenName = userInfo.getSubject();
-        System.out.println("TokenName = " + TokenName);
-        String role = userInfo.get(AUTHORIZATION_KEY, String.class);
-        System.out.println("role = " + role);
- 
-        if (!(role!=null && role.equals(UserRoleEnum.ADMIN.getAuthority())) || TokenName.equals(username)) {
+        String role= userInfo.get("auth", String.class);
+        String tokenName = userInfo.getSubject();
+        if (!((role!=null && role.equals("ADMIN") || tokenName.equals(username)))) {
             throw new IllegalArgumentException("작성자만 삭제/수정할 수 있습니다.");
         }
         return true;
